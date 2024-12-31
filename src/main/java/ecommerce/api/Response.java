@@ -1,4 +1,4 @@
-package ecommerce.pojo;
+package ecommerce.api;
 
 public interface Response {
 }
