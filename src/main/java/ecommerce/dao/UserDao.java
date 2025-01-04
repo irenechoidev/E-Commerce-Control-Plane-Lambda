@@ -1,7 +1,9 @@
 package ecommerce.dao;
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import ecommerce.models.User;
 import lombok.NonNull;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
 import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
@@ -12,6 +14,7 @@ public class UserDao {
     private static final String TABLE_NAME = "e-commerce-user-table-v1";
     private static final TableSchema<User> userSchema = TableSchema.fromBean(User.class);
     private static DynamoDbEnhancedClient enhancedClient;
+    private static PasswordEncoder passwordEncoder;
 
     public UserDao() {
         DynamoDbClient dynamoDbClient = DynamoDbClient.builder()
@@ -21,10 +24,17 @@ public class UserDao {
         enhancedClient = DynamoDbEnhancedClient.builder()
                 .dynamoDbClient(dynamoDbClient)
                 .build();
+
+        passwordEncoder = new BCryptPasswordEncoder();
     }
 
     public void createUser(@NonNull User user) {
         DynamoDbTable<User> userTable = enhancedClient.table(TABLE_NAME, userSchema);
+
+        String unhashedPassword = user.getPassword();
+        String hashedPassword = passwordEncoder.encode(unhashedPassword);
+        user.setPassword(hashedPassword);
+
         userTable.putItem(user);
     }
 }
