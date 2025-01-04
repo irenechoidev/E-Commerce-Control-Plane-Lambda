@@ -13,6 +13,11 @@
   </properties>
   <dependencies>
     <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-crypto</artifactId>
+      <version>6.4.1</version>
+    </dependency>
+    <dependency>
       <groupId>com.amazonaws</groupId>
       <artifactId>aws-lambda-java-core</artifactId>
       <version>1.2.1</version>
