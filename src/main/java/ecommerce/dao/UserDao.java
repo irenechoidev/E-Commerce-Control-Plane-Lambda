@@ -6,6 +6,7 @@ import lombok.NonNull;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
+import software.amazon.awssdk.enhanced.dynamodb.Key;
 import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
 import software.amazon.awssdk.http.urlconnection.UrlConnectionHttpClient;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
@@ -15,6 +16,7 @@ public class UserDao {
     private static final TableSchema<User> userSchema = TableSchema.fromBean(User.class);
     private static DynamoDbEnhancedClient enhancedClient;
     private static PasswordEncoder passwordEncoder;
+    private static DynamoDbTable<User> userTable;
 
     public UserDao() {
         DynamoDbClient dynamoDbClient = DynamoDbClient.builder()
@@ -25,16 +27,22 @@ public class UserDao {
                 .dynamoDbClient(dynamoDbClient)
                 .build();
 
+        userTable = enhancedClient.table(TABLE_NAME, userSchema);
         passwordEncoder = new BCryptPasswordEncoder();
     }
 
     public void createUser(@NonNull User user) {
-        DynamoDbTable<User> userTable = enhancedClient.table(TABLE_NAME, userSchema);
-
         String unhashedPassword = user.getPassword();
         String hashedPassword = passwordEncoder.encode(unhashedPassword);
         user.setPassword(hashedPassword);
 
         userTable.putItem(user);
+    }
+
+    @NonNull
+    public User getUser(@NonNull String userId) {
+        return userTable.getItem(Key.builder()
+                .partitionValue(userId)
+                .build());
     }
 }

@@ -1,13 +1,16 @@
 package ecommerce.api;
 
+import ecommerce.models.User;
 import lombok.Builder;
 import lombok.Data;
 
 @Data
 @Builder
-public class CreateUserResponse implements Response {
+public class GetUserResponse implements Response {
+    private User user;
+
     @Override
     public Object getData() {
-        return new Object();
+        return user;
     }
 }
