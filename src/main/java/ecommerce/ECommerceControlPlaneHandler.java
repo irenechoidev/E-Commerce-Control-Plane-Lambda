@@ -10,7 +10,7 @@ import ecommerce.service.UserService;
 public class ECommerceControlPlaneHandler implements
         RequestHandler<APIGatewayProxyRequestEvent, Object> {
 
-  private static final String USER_API_PATH = "/api/v1/user/";
+  private static final String USER_API_PATH = "/api/v1/user";
 
   private static final UserService userService = new UserService();
 
@@ -21,7 +21,7 @@ public class ECommerceControlPlaneHandler implements
     logger.log("Path: " + event.getPath());
 
     if (event.getPath().equals(USER_API_PATH)) {
-        return handleUserRequest(event).getData();
+        return handleUserRequest(event);
     }
 
     throw new UnsupportedOperationException("API Path is not supported");
