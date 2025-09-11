@@ -18,7 +18,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Install dependencies
-        run: mvn install
+        run: mvn clean package
 
       - name: Run backend tests
         run: mvn test
