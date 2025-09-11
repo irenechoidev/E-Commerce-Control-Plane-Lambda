@@ -15,9 +15,9 @@ public class ProductService {
 
     private static final int SUCCESS_STATUS_CODE = 200;
 
-    private static final String QUERY_PARAMS_USER_ID_KEY = "productId";
+    private static final String QUERY_PARAMS_PRODUCT_ID_KEY = "productId";
     private static final ObjectMapper objectMapper = new ObjectMapper();
-    private static ProductDao productDao;
+    private final ProductDao productDao;
 
     public ProductService() {
         productDao = DbConfig.getProductDao();
@@ -38,7 +38,7 @@ public class ProductService {
 
     public Response getProduct(@NonNull APIGatewayProxyRequestEvent event) {
         Map<String, String> queryParams = event.getQueryStringParameters();
-        String productId = queryParams.getOrDefault(QUERY_PARAMS_USER_ID_KEY, "");
+        String productId = queryParams.getOrDefault(QUERY_PARAMS_PRODUCT_ID_KEY, "");
 
         Product product = productDao.getProduct(productId);
 
