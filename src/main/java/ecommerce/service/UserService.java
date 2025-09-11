@@ -4,6 +4,7 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ecommerce.api.Response;
+import ecommerce.config.DbConfig;
 import ecommerce.dao.UserDao;
 import ecommerce.models.User;
 import lombok.NonNull;
@@ -19,7 +20,7 @@ public class UserService {
     private static UserDao userDao;
 
     public UserService() {
-        userDao = new UserDao();
+        userDao = DbConfig.getUserDao();
     }
 
     public Response createUser(@NonNull APIGatewayProxyRequestEvent event) {

@@ -4,6 +4,7 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ecommerce.api.Response;
+import ecommerce.config.DbConfig;
 import ecommerce.dao.ProductDao;
 import ecommerce.models.Product;
 import lombok.NonNull;
@@ -19,7 +20,7 @@ public class ProductService {
     private static ProductDao productDao;
 
     public ProductService() {
-        productDao = new ProductDao();
+        productDao = DbConfig.getProductDao();
     }
 
     public Response createProduct(@NonNull APIGatewayProxyRequestEvent event) {
