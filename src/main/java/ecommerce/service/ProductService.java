@@ -4,6 +4,7 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ecommerce.api.CreateProductImageResponseDto;
+import ecommerce.api.ImageDto;
 import ecommerce.api.Response;
 import ecommerce.config.AppConfig;
 import ecommerce.config.DbConfig;
@@ -13,6 +14,7 @@ import ecommerce.models.ProductImage;
 import ecommerce.s3.ECommerceS3Client;
 import lombok.NonNull;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -77,6 +79,29 @@ public class ProductService {
             return Response.builder()
                     .statusCode(SUCCESS_STATUS_CODE)
                     .body(objectMapper.writeValueAsString(responseDto))
+                    .build();
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public Response getProductImages(@NonNull APIGatewayProxyRequestEvent event) {
+        try {
+            Map<String, String> queryParams = event.getQueryStringParameters();
+            String productId = queryParams.getOrDefault(QUERY_PARAMS_PRODUCT_ID_KEY, "");
+
+            List<ProductImage> images = productDao.getProductImages(productId);
+            List<ImageDto> imageDtoList = images.stream()
+                    .map(image -> ImageDto.builder()
+                            .id(image.getId())
+                            .position(image.getPosition())
+                            .url(eCommerceS3Client.getPreSignedUrl(image.getImageKey()))
+                            .build())
+                    .toList();
+
+            return Response.builder()
+                    .statusCode(SUCCESS_STATUS_CODE)
+                    .body(objectMapper.writeValueAsString(imageDtoList))
                     .build();
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);

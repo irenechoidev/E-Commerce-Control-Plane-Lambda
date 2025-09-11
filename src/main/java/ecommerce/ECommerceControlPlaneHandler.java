@@ -33,7 +33,11 @@ public class ECommerceControlPlaneHandler implements
   }
 
   private Response handleProductImageRequest(APIGatewayProxyRequestEvent event) {
-      return productService.createProductImage(event);
+      if (event.getHttpMethod().equals("POST")) {
+          return productService.createProductImage(event);
+      }
+
+      return productService.getProductImages(event);
   }
 
   private Response handleProductRequest(APIGatewayProxyRequestEvent event) {
