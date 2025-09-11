@@ -3,13 +3,18 @@ package ecommerce.service;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import ecommerce.api.CreateProductImageResponseDto;
 import ecommerce.api.Response;
+import ecommerce.config.AppConfig;
 import ecommerce.config.DbConfig;
 import ecommerce.dao.ProductDao;
 import ecommerce.models.Product;
+import ecommerce.models.ProductImage;
+import ecommerce.s3.ECommerceS3Client;
 import lombok.NonNull;
 
 import java.util.Map;
+import java.util.UUID;
 
 public class ProductService {
 
@@ -18,9 +23,11 @@ public class ProductService {
     private static final String QUERY_PARAMS_PRODUCT_ID_KEY = "productId";
     private static final ObjectMapper objectMapper = new ObjectMapper();
     private final ProductDao productDao;
+    private final ECommerceS3Client eCommerceS3Client;
 
     public ProductService() {
         productDao = DbConfig.getProductDao();
+        eCommerceS3Client = AppConfig.getEcommerceS3Client();
     }
 
     public Response createProduct(@NonNull APIGatewayProxyRequestEvent event) {
@@ -48,6 +55,28 @@ public class ProductService {
             return Response.builder()
                     .statusCode(SUCCESS_STATUS_CODE)
                     .body(serializedProduct)
+                    .build();
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public Response createProductImage(@NonNull APIGatewayProxyRequestEvent event) {
+        try {
+            ProductImage image = objectMapper.readValue(event.getBody(), ProductImage.class);
+            String imageKey = UUID.randomUUID().toString();
+            image.setImageKey(imageKey);
+
+            String preSignedUrl = eCommerceS3Client.createPreSignedUrl(imageKey);
+            productDao.createProductImage(image);
+
+            CreateProductImageResponseDto responseDto = CreateProductImageResponseDto.builder()
+                    .preSignedUrl(preSignedUrl)
+                    .build();
+
+            return Response.builder()
+                    .statusCode(SUCCESS_STATUS_CODE)
+                    .body(objectMapper.writeValueAsString(responseDto))
                     .build();
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
