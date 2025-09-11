@@ -4,12 +4,9 @@ import ecommerce.dao.ProductDao;
 import ecommerce.dao.UserDao;
 import ecommerce.models.Product;
 import ecommerce.models.User;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
 import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
-import software.amazon.awssdk.http.urlconnection.UrlConnectionHttpClient;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 
 public class DbConfig {
@@ -18,7 +15,7 @@ public class DbConfig {
 
     private static final DynamoDbEnhancedClient enhancedClient = DynamoDbEnhancedClient.builder()
             .dynamoDbClient(DynamoDbClient.builder()
-                    .httpClient(UrlConnectionHttpClient.builder().build())
+                    .httpClient(AppConfig.getHttpClient())
                     .build())
             .build();
 
@@ -30,14 +27,12 @@ public class DbConfig {
     private static final DynamoDbTable<User> userTable =
             enhancedClient.table(USER_TABLE_NAME, userSchema);
 
-    private static final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private static final ProductDao productDao = new ProductDao(productTable);
-    private static final UserDao userDao = new UserDao(userTable, passwordEncoder);
+    private static final UserDao userDao = new UserDao(userTable, AppConfig.getPasswordEncoder());
 
     public static ProductDao getProductDao() {
         return productDao;
     }
-
     public static UserDao getUserDao() {
         return userDao;
     }
