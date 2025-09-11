@@ -5,6 +5,10 @@ import ecommerce.models.ProductImage;
 import lombok.NonNull;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
 import software.amazon.awssdk.enhanced.dynamodb.Key;
+import software.amazon.awssdk.enhanced.dynamodb.model.QueryConditional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class ProductDao {
     private final DynamoDbTable<Product> productTable;
@@ -31,5 +35,18 @@ public class ProductDao {
 
     public void createProductImage(@NonNull ProductImage productImage) {
         productImageTable.putItem(productImage);
+    }
+
+    @NonNull
+    public List<ProductImage> getProductImages(@NonNull String productId) {
+        QueryConditional queryConditional = QueryConditional.keyEqualTo(Key.builder()
+                .partitionValue(productId)
+                .build());
+
+        return productImageTable
+                .query(queryConditional)
+                .items()
+                .stream()
+                .collect(Collectors.toList());
     }
 }

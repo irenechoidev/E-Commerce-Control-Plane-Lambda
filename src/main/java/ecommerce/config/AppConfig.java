@@ -5,18 +5,14 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import software.amazon.awssdk.http.SdkHttpClient;
 import software.amazon.awssdk.http.urlconnection.UrlConnectionHttpClient;
-import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 
 public class AppConfig {
     private static final SdkHttpClient httpClient = UrlConnectionHttpClient.builder().build();
     private static final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private static final S3Presigner s3Presigner = S3Presigner.create();
-    private static final S3Client s3Client = S3Client.builder()
-            .httpClient(httpClient)
-            .build();
 
-    private static final ECommerceS3Client ecommerceS3Client = new ECommerceS3Client(s3Client, s3Presigner);
+    private static final ECommerceS3Client ecommerceS3Client = new ECommerceS3Client(s3Presigner);
 
     public static PasswordEncoder getPasswordEncoder() {
         return passwordEncoder;
