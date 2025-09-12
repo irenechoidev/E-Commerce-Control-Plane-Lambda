@@ -22,6 +22,7 @@ public class ProductService {
 
     private static final int SUCCESS_STATUS_CODE = 200;
 
+    private static final String QUERY_PARAMS_ID_KEY = "id";
     private static final String QUERY_PARAMS_PRODUCT_ID_KEY = "productId";
     private static final ObjectMapper objectMapper = new ObjectMapper();
     private final ProductDao productDao;
@@ -106,5 +107,17 @@ public class ProductService {
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public Response deleteProductImage(@NonNull APIGatewayProxyRequestEvent event) {
+        Map<String, String> queryParams = event.getQueryStringParameters();
+        String id = queryParams.getOrDefault(QUERY_PARAMS_ID_KEY, "");
+        String productId = queryParams.getOrDefault(QUERY_PARAMS_PRODUCT_ID_KEY, "");
+
+        productDao.deleteProductImage(productId, id);
+
+        return Response.builder()
+                .statusCode(SUCCESS_STATUS_CODE)
+                .build();
     }
 }

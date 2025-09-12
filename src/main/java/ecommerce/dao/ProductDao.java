@@ -49,4 +49,11 @@ public class ProductDao {
                 .stream()
                 .collect(Collectors.toList());
     }
+
+    public void deleteProductImage(@NonNull String productId, @NonNull String id) {
+        productImageTable.deleteItem(Key.builder()
+                .partitionValue(productId)
+                .sortValue(id)
+                .build());
+    }
 }

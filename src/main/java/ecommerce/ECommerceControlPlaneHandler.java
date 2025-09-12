@@ -35,6 +35,8 @@ public class ECommerceControlPlaneHandler implements
   private Response handleProductImageRequest(APIGatewayProxyRequestEvent event) {
       if (event.getHttpMethod().equals("POST")) {
           return productService.createProductImage(event);
+      } else if (event.getHttpMethod().equals("DELETE")) {
+          return productService.deleteProductImage(event);
       }
 
       return productService.getProductImages(event);
